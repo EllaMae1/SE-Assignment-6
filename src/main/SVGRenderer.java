@@ -55,7 +55,7 @@ public class SVGRenderer
 	public void render()
 	{
 		final Graphics2D g2d = view.graphics2D();
-			
+
      	g2d.setPaint(Color.white);
        	g2d.fillRect(0, 0, view.getWidth(), view.getHeight());
 
@@ -66,14 +66,70 @@ public class SVGRenderer
        	Graphics2D g2dImage = (Graphics2D)img.getGraphics();
        	g2dImage.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
        	g2dImage.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-       	
+
        	g2d.setPaint(new Color(255, 127, 0));
        	g2d.drawString("Draw SVG contents here.", 10, 20);
 
+		// **
+		// ** TODO: Draw SVG contents here.
+		// **
+
+       	for(Element element : svg.elements()){
+			Shape shape = null;
+			Decorator decorator = null;
+			String elementLabel = element.label();
+
+			switch(elementLabel){
+				case "circle":
+					shape = (Circle) element;
+					decorator = new DecoratorGraphics2DCircle((Circle) shape, g2dImage);
+					break;
+				case "ellipse":
+					shape = (Ellipse) element;
+					decorator = new DecoratorGraphics2DEllipse((Ellipse) shape, g2dImage);
+					break;
+				case "line":
+					shape = (Line) element;
+					decorator = new DecoratorGraphics2DLine((Line) shape, g2dImage);
+					break;
+				case "polygon":
+					shape = (Polygon) element;
+					decorator = new DecoratorGraphics2DPolygon((Polygon) shape, g2dImage);
+					break;
+				case "polyline":
+					shape = (Polyline) element;
+					decorator = new DecoratorGraphics2DPolyline((Polyline) shape, g2dImage);
+					break;
+				case "rect":
+					shape = (Rect) element;
+					decorator = new DecoratorGraphics2DRect((Rect) shape, g2dImage);
+					break;
+				case "path":
+					shape = (Path) element;
+					decorator = new DecoratorGraphics2DPath((Path) shape, g2dImage);
+					break;
+			}
+
+			if(shape != null) {
+				// Style code from assignment pdf
+				for (Style style : shape.styles()) {
+					String styleLabel = style.label();
+					if (styleLabel.equals("stroke-width")) {
+						new DecoratorGraphics2DStrokeWidth((StrokeWidth) style, g2dImage).render();
+						break;
+					}
+				}
+			}
+
+			if(decorator != null){
+				decorator.render();
+			}
+		}
+
        	// **
-       	// ** TODO: Draw SVG contents here.
-       	// **
-   	   	
+		// ** End of TODO
+		// **
+
        	if (!view.zoom())
        	{
        		// Just draw elements
@@ -83,18 +139,18 @@ public class SVGRenderer
        	{
        		// Draw to image then scale to window
       	   	final Rectangle2D.Double bounds = svg.bounds();
-      	   	final double sw = svg.maxStrokeWidht();
+      	   	final double sw = svg.maxStrokeWidth();
       	   	final double svgWidth  = bounds.getX() + bounds.getWidth()  + sw;
       	   	final double svgHeight = bounds.getY() + bounds.getHeight() + sw;
-      	   	
+
     	   	final double scale = (svgHeight == 0) ? 1 : (view.getHeight() / svgHeight);
-       	   	
+
       	   	final int sx = (int)(svgWidth + 0.5);
       	   	final int sy = (int)(svgHeight + 0.5);
-      	   	
+
       	   	final int dx = (int)(svgWidth  * scale + 0.5);
       	   	final int dy = (int)(svgHeight * scale + 0.5);
-      	   
+
       	   	g2d.drawImage(img, 0, 0, dx, dy, 0, 0, sx, sy, null);
        	}
 	}

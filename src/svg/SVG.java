@@ -92,7 +92,7 @@ public class SVG
 	/**
 	 * @return Maximum stroke width specified for any element.
 	 */
-	public double maxStrokeWidht()
+	public double maxStrokeWidth()
 	{
 		double maxWidth = 0;
 		for (Element element : elements)
